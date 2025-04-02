@@ -20,10 +20,12 @@ internal class StompSocket(
     val incomingEvents: Flow<StompEvent> = webSocketConnection.incomingFrames
             .catch { registerWsExceptionAndRethrow(it) }
             .map { decodeStomp(it) }
-            .catch {
-                close(cause = it)
-                // propagate the exception to the consumers of the STOMP events
-                throw it
+            .catch { e ->
+                if (e !is StompErrorFrameReceived) {
+                    // propagate the exception to the consumers of the STOMP events
+                    close(cause = e)
+                    throw e
+                }
             }
 
     private suspend fun registerWsExceptionAndRethrow(ex: Throwable) {
@@ -38,11 +40,7 @@ internal class StompSocket(
         val event = wsFrame.decodeToStompEvent()
         val frame = event as? StompFrame ?: return event
         config.instrumentation?.onFrameDecoded(wsFrame, frame)
-        if (frame is StompFrame.Error) {
-            // we throw an exception here (not a materialized error yet) because
-            // we want to catch it in the main flow in order to close the websocket
-            throw StompErrorFrameReceived(frame)
-        }
+        //Do not throw StompErrorFrameReceived
         return frame
     }
 
