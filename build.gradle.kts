@@ -21,7 +21,7 @@ allprojects {
     }
 
     group = "com.github.plato-corp"
-    version = "1.0.0"
+    version = "1.0.1"
 
     // JVM 대상에 대해 Java 11 설정
     tasks.withType<JavaCompile> {
