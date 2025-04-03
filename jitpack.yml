@@ -1,9 +1,8 @@
 jdk:
-  - openjdk17
+  - openjdk11
 before_install:
-  - sdk install java 17.0.1-open
-  - sdk use java 17.0.1-open
-  - ./gradlew wrapper --gradle-version 8.13
+  - sdk install java 11.0.21-open
+  - sdk use java 11.0.21-open
   - npm install -g npm@latest
 install:
   - ./gradlew clean assemble publishToMavenLocal
